@@ -1,0 +1,74 @@
+<div class="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white pt-32 px-6 flex flex-col items-center">
+
+  <div class="text-center mb-16">
+    <h1 class="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+      Universal File Converter
+    </h1>
+    <p class="text-gray-400 text-lg">
+      Convert documents, images and media instantly
+    </p>
+  </div>
+
+
+  <div *ngIf="currentStep === 'UPLOAD'" class="w-full max-w-6xl">
+    <div class="grid md:grid-cols-2 gap-10">
+
+      <div class="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-10 shadow-xl">
+        <h2 class="text-xl font-semibold mb-6 text-gray-300">Upload File</h2>
+        <div class="flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-xl p-12 text-center cursor-pointer hover:border-blue-400 hover:bg-white/5 transition" (drop)="onDrop($event)" (dragover)="onDragOver($event)" (click)="fileInput.click()">
+          <div class="text-5xl mb-4">📤</div>
+          <p class="text-gray-300">Drag & Drop your file</p>
+          <p class="text-gray-500 text-sm mt-2">or click to browse</p>
+          <input #fileInput type="file" (change)="onFileSelected($event)" class="hidden">
+        </div>
+        <p *ngIf="selectedFile" class="mt-4 text-green-400 text-sm">✔ {{selectedFile.name}}</p>
+      </div>
+
+      <div class="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-10 shadow-xl">
+        <h2 class="text-xl font-semibold mb-6 text-gray-300">Convert To</h2>
+        <div class="relative" #dropdownContainer>
+          <input type="text" [(ngModel)]="searchText" (input)="filterFormats()" (click)="toggleDropdown()" placeholder="Search format..." class="w-full bg-black/40 border border-gray-600 rounded-xl p-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400">
+          <span (click)="toggleDropdown()" class="absolute right-4 top-3 text-gray-400 cursor-pointer">▼</span>
+          <div *ngIf="dropdownOpen" class="absolute w-full bg-gray-900 border border-gray-700 rounded-xl shadow-xl mt-2 max-h-56 overflow-y-auto z-20">
+            <div *ngFor="let format of filteredFormats" (click)="selectFormat(format)" class="p-3 hover:bg-blue-600 cursor-pointer transition">{{format}}</div>
+          </div>
+        </div>
+        <p *ngIf="selectedFormat" class="mt-4 text-green-400  text-sm">Selected format: <b>{{selectedFormat}}</b></p>
+      </div>
+    </div>
+
+    <div class="flex justify-center mt-16">
+      <button (click)="convertFile()" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:scale-105 transition transform text-white px-14 py-4 rounded-xl shadow-xl text-lg font-bold">
+        Convert File
+      </button>
+    </div>
+  </div>
+
+
+  <div *ngIf="currentStep === 'CONVERTING'" class="flex flex-col items-center justify-center mt-10">
+    <div class="w-20 h-20 border-8 border-gray-700 border-t-blue-500 rounded-full animate-spin mb-8"></div>
+    <h2 class="text-3xl font-bold text-white mb-2">Converting File...</h2>
+    <p class="text-gray-400">Please wait while we process your file.</p>
+  </div>
+
+
+  <div *ngIf="currentStep === 'DONE'" class="flex flex-col items-center justify-center mt-10 backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-16 shadow-xl w-full max-w-3xl">
+    <div class="text-6xl mb-6">🎉</div>
+    <h2 class="text-3xl font-bold text-white mb-8">Conversion Complete!</h2>
+    
+    <div class="flex flex-col md:flex-row gap-6">
+      <button (click)="downloadFile()" class="bg-green-600 hover:bg-green-500 hover:scale-105 transition transform text-white px-12 py-4 rounded-xl shadow-xl text-lg font-bold flex items-center gap-2">
+        <span>⬇️</span> Download File
+      </button>
+
+      <button (click)="startOver()" class="bg-gray-700 hover:bg-gray-600 hover:scale-105 transition transform text-white px-12 py-4 rounded-xl shadow-xl text-lg font-bold">
+        Convert Another
+      </button>
+    </div>
+  </div>
+
+  <div class="text-center text-gray-500 mt-20 text-sm">
+    ⚡ Secure • Fast • Unlimited File Conversion
+  </div>
+
+</div>

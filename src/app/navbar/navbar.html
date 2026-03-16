@@ -1,0 +1,33 @@
+<nav class="fixed top-0 left-0 w-full z-50 backdrop-blur-xl bg-black/40 border-b border-white/10">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
+    <div routerLink="/" class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent cursor-pointer">
+      FileForge
+    </div>
+
+    <div class="hidden md:flex items-center gap-8 text-gray-300">
+      
+      <a routerLink="/" routerLinkActive="text-white font-semibold" [routerLinkActiveOptions]="{exact: true}" class="hover:text-white transition duration-200 cursor-pointer">
+        Home
+      </a>
+
+      <a routerLink="/history" routerLinkActive="text-white font-semibold" class="hover:text-white transition duration-200 cursor-pointer">
+        History
+      </a>
+
+      <a routerLink="/images" routerLinkActive="text-white font-semibold" class="hover:text-white transition duration-200 cursor-pointer">
+        Images
+      </a>
+
+      <a routerLink="/about" routerLinkActive="text-white font-semibold" class="hover:text-white transition duration-200 cursor-pointer">
+        About
+      </a>
+
+    </div>
+
+    <div class="md:hidden text-gray-300 text-xl cursor-pointer">
+      ☰
+    </div>
+
+  </div>
+</nav>
