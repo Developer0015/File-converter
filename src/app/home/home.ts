@@ -96,64 +96,53 @@ export class Home {
   }
 
   /* ---------- convert ---------- */
-convertFile() {
+  convertFile() {
+    if (!this.selectedFile) {
+      alert('Upload file first');
+      return;
+    }
+    if (!this.selectedFormat) {
+      alert('Select format first');
+      return;
+    }
 
-  if (!this.selectedFile || !this.selectedFormat) {
-    alert("Select file & format");
-    return;
-  }
+    this.currentStep = 'CONVERTING';
 
-  this.currentStep = 'CONVERTING';
+    this.fileService.convert(this.selectedFile, this.selectedFormat).subscribe({
+      next: (res: Blob) => {
+        // 1. Pull the execution back into Angular's Zone
+        this.ngZone.run(() => {
+          this.convertedBlob = res;
+          this.currentStep = 'DONE';
 
-  this.fileService.convert(this.selectedFile, this.selectedFormat)
-    .subscribe({
-
-      next: (res) => {
-
-        const contentType = res.headers.get('Content-Type');
-
-        // ❌ If backend error (JSON)
-        if (contentType && contentType.includes('application/json')) {
-
-          const reader = new FileReader();
-
-          reader.onload = () => {
-            console.error("Backend error:", reader.result);
-            alert("Conversion failed");
-            this.currentStep = 'UPLOAD';
-          };
-
-          reader.readAsText(res.body!);
-          return;
-        }
-
-        // ✅ Success
-        this.convertedBlob = res.body!;
-        this.currentStep = 'DONE';
+          // 2. Smash the update button to force the DOM to redraw instantly
+          this.cdr.detectChanges();
+        });
       },
+      error: (err: any) => {
+        this.ngZone.run(() => {
+          console.error(err);
+          alert('Conversion failed');
+          this.currentStep = 'UPLOAD';
 
-      error: (err) => {
-        console.error(err);
-        alert("Conversion failed");
-        this.currentStep = 'UPLOAD';
-      }
-
+          // Force redraw on error too
+          this.cdr.detectChanges();
+        });
+      },
     });
-}
+  }
 
   /* ---------- download ---------- */
   downloadFile() {
-  if (!this.convertedBlob) return;
+    if (!this.convertedBlob) return;
 
-  const url = window.URL.createObjectURL(this.convertedBlob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "converted." + this.selectedFormat.toLowerCase();
-  a.click();
-
-  window.URL.revokeObjectURL(url);
-}
+    const url = window.URL.createObjectURL(this.convertedBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'converted.' + this.selectedFormat.toLowerCase();
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
 
   /* ---------- start over ---------- */
   startOver() {
