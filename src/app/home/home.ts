@@ -96,7 +96,7 @@ export class Home {
   }
 
   /* ---------- convert ---------- */
-  convertFile() {
+convertFile() {
 
   if (!this.selectedFile || !this.selectedFormat) {
     alert("Select file & format");
@@ -108,27 +108,28 @@ export class Home {
   this.fileService.convert(this.selectedFile, this.selectedFormat)
     .subscribe({
 
-      next: (res: any) => {
+      next: (res) => {
 
-        // 🔥 CHECK IF RESPONSE IS JSON ERROR
-        if (res.body.type === 'application/json') {
+        const contentType = res.headers.get('Content-Type');
+
+        // ❌ If backend error (JSON)
+        if (contentType && contentType.includes('application/json')) {
 
           const reader = new FileReader();
 
           reader.onload = () => {
             console.error("Backend error:", reader.result);
-            alert("Conversion failed (backend error)");
+            alert("Conversion failed");
             this.currentStep = 'UPLOAD';
           };
 
-          reader.readAsText(res.body);
+          reader.readAsText(res.body!);
           return;
         }
 
-        // ✅ SUCCESS
-        this.convertedBlob = res.body;
+        // ✅ Success
+        this.convertedBlob = res.body!;
         this.currentStep = 'DONE';
-
       },
 
       error: (err) => {
@@ -142,15 +143,17 @@ export class Home {
 
   /* ---------- download ---------- */
   downloadFile() {
-    if (!this.convertedBlob) return;
+  if (!this.convertedBlob) return;
 
-    const url = window.URL.createObjectURL(this.convertedBlob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'converted.' + this.selectedFormat.toLowerCase();
-    a.click();
-    window.URL.revokeObjectURL(url);
-  }
+  const url = window.URL.createObjectURL(this.convertedBlob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "converted." + this.selectedFormat.toLowerCase();
+  a.click();
+
+  window.URL.revokeObjectURL(url);
+}
 
   /* ---------- start over ---------- */
   startOver() {

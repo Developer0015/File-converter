@@ -1,28 +1,25 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FileService {
 
-constructor(private http: HttpClient) {}
+  private API = 'https://file-con-backend-1.onrender.com/api/convert';
 
-convert(file: File, format: string) {
+  constructor(private http: HttpClient) {}
 
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('format', format);
+  convert(file: File, format: string): Observable<HttpResponse<Blob>> {
 
-  return this.http.post(
-    'https://file-con-backend-1.onrender.com/api/convert',
-    formData,
-    {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('format', format);
+
+    return this.http.post(this.API, formData, {
       responseType: 'blob',
       observe: 'response'
-    }
-  );
-}
+    });
+  }
 }
