@@ -97,40 +97,48 @@ export class Home {
 
   /* ---------- convert ---------- */
   convertFile() {
-    if (!this.selectedFile) {
-      alert('Upload file first');
-      return;
-    }
-    if (!this.selectedFormat) {
-      alert('Select format first');
-      return;
-    }
 
-    this.currentStep = 'CONVERTING';
-
-    this.fileService.convert(this.selectedFile, this.selectedFormat).subscribe({
-      next: (res: Blob) => {
-        // 1. Pull the execution back into Angular's Zone
-        this.ngZone.run(() => {
-          this.convertedBlob = res;
-          this.currentStep = 'DONE';
-
-          // 2. Smash the update button to force the DOM to redraw instantly
-          this.cdr.detectChanges();
-        });
-      },
-      error: (err: any) => {
-        this.ngZone.run(() => {
-          console.error(err);
-          alert('Conversion failed');
-          this.currentStep = 'UPLOAD';
-
-          // Force redraw on error too
-          this.cdr.detectChanges();
-        });
-      },
-    });
+  if (!this.selectedFile || !this.selectedFormat) {
+    alert("Select file & format");
+    return;
   }
+
+  this.currentStep = 'CONVERTING';
+
+  this.fileService.convert(this.selectedFile, this.selectedFormat)
+    .subscribe({
+
+      next: (res: any) => {
+
+        // 🔥 CHECK IF RESPONSE IS JSON ERROR
+        if (res.body.type === 'application/json') {
+
+          const reader = new FileReader();
+
+          reader.onload = () => {
+            console.error("Backend error:", reader.result);
+            alert("Conversion failed (backend error)");
+            this.currentStep = 'UPLOAD';
+          };
+
+          reader.readAsText(res.body);
+          return;
+        }
+
+        // ✅ SUCCESS
+        this.convertedBlob = res.body;
+        this.currentStep = 'DONE';
+
+      },
+
+      error: (err) => {
+        console.error(err);
+        alert("Conversion failed");
+        this.currentStep = 'UPLOAD';
+      }
+
+    });
+}
 
   /* ---------- download ---------- */
   downloadFile() {
