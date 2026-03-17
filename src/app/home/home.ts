@@ -2,7 +2,8 @@ import {
   Component,
   HostListener,
   ElementRef,
-  ViewChild
+  ViewChild,
+  NgZone
 } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
@@ -19,7 +20,10 @@ import { FileService } from '../services/file.service';
 })
 export class Home {
 
-  constructor(private fileService: FileService) {}
+  constructor(
+    private fileService: FileService,
+    private ngZone: NgZone   // ⭐ IMPORTANT
+  ) {}
 
   @ViewChild('dropdownContainer') dropdownContainer!: ElementRef;
 
@@ -98,13 +102,22 @@ export class Home {
     this.fileService.convert(this.selectedFile, this.selectedFormat)
       .subscribe({
         next: (res: Blob) => {
-          this.convertedBlob = res;
-          this.currentStep = 'DONE';
+
+          // ⭐ FORCE Angular to update UI immediately
+          this.ngZone.run(() => {
+            this.convertedBlob = res;
+            this.currentStep = 'DONE';
+          });
+
         },
         error: (err:any) => {
-          console.error(err);
-          alert("Conversion failed");
-          this.currentStep = 'UPLOAD';
+
+          this.ngZone.run(() => {
+            console.error(err);
+            alert("Conversion failed");
+            this.currentStep = 'UPLOAD';
+          });
+
         }
       });
   }
