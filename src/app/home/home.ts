@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpResponse } from '@angular/common/http';
 import { FileService } from '../services/file.service';
 
 @Component({
@@ -109,10 +109,10 @@ export class Home {
     this.currentStep = 'CONVERTING';
 
     this.fileService.convert(this.selectedFile, this.selectedFormat).subscribe({
-      next: (res: Blob) => {
+      next: (res: HttpResponse<Blob>) => {
         // 1. Pull the execution back into Angular's Zone
         this.ngZone.run(() => {
-          this.convertedBlob = res;
+          this.convertedBlob = res.body;
           this.currentStep = 'DONE';
 
           // 2. Smash the update button to force the DOM to redraw instantly
